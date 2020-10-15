@@ -2,14 +2,22 @@
 //
 
 #include <iostream>
+
 #include "CCSVParser.h"
+
 
 int main()
 {
 	CCSVParser parser;
-	if (parser.openFile("input.csv"))
+	if (parser.parse(".//TestData//input.csv"))  // path to example data.
 	{
-		// todo: success
+		table_t tb = parser.getTable();
+
+		row_t row;
+		row.push_back("Strings");
+		row.push_back("Float Values");
+		parser.filter(row);
+		parser.log();
 	}
  
 	return 0;
