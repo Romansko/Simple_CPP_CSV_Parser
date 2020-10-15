@@ -1,11 +1,11 @@
 #include "CCSVParser.h"
 
 #include <fstream>
-#include <iomanip>
 #include <sstream>
 
 #define DEBUG_MODE  // uncomment if not needed.
 #ifdef DEBUG_MODE
+#include <iomanip>
 #include <Windows.h>
 #endif
 
