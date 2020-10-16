@@ -56,22 +56,26 @@ int main()
 
 	if (stb != nullptr)
 	{
-		std::ofstream output;
-		output.open(".//TestData//output.csv");
-		const int32_t headerSize = parser.getHeader().size();
-		auto hdr = parser.getHeader();
-		auto title = hdr.begin();
-		for (; title != hdr.end()-1; ++title)
+		try
 		{
-			output << *title << ",";
-		}
-		output << *title << std::endl;
+			std::ofstream output;
+			output.open(".//TestData//output.csv");
+			const int32_t headerSize = parser.getHeader().size();
+			auto hdr = parser.getHeader();
+			auto title = hdr.begin();
+			for (; title != hdr.end() - 1; ++title)
+			{
+				output << *title << ",";
+			}
+			output << *title << std::endl;
 
-		for (auto i = 0; i < parser.getRowSize(); ++i)
-		{
-			output << stb[i].intVal << "," << stb[i].floatVal << "," << stb[i].stringVal << std::endl;
+			for (uint32_t i = 0; i < parser.getRowSize(); ++i)
+			{
+				output << stb[i].intVal << "," << stb[i].floatVal << "," << stb[i].stringVal << std::endl;
+			}
+			output.close();
 		}
-		output.close();
+		catch(...) { /* Do Nothing */ }
 		delete[] stb;
 	}
  
