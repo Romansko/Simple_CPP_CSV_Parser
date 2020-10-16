@@ -11,20 +11,32 @@ class CCSVParser
 {
 	
 public:
-	enum { TITLES_INDEX = 0};
+	enum { HEADER_INDEX = 0};
 	
 	CCSVParser();
-	~CCSVParser();
-	virtual table_t getTable();
+	virtual ~CCSVParser();
+
 	virtual void reset();
 	virtual bool parse(const char* filePath);
 	virtual void removeByTitle(const std::string& title);
 	virtual void filter(row_t& columnsToKeep);
+	
+	virtual table_t getTable();
+	virtual size_t  getColumnsSize();
+	virtual size_t  getRowSize();
+	virtual row_t   getHeader();
+	
+	virtual bool    getValue(uint32_t row, uint32_t col, int32_t&     parsedVal);
+	virtual bool    getValue(uint32_t row, uint32_t col, int64_t&     parsedVal);
+	virtual bool    getValue(uint32_t row, uint32_t col, float&       parsedVal);
+	virtual bool    getValue(uint32_t row, uint32_t col, double&      parsedVal);
+	virtual bool    getValue(uint32_t row, uint32_t col, const char** parsedVal);
+	
 	virtual void log();
 	
 protected:
-	virtual void removeRow(unsigned int index);
-	virtual void removeByTitle(unsigned int index);
+	virtual void removeRow(uint32_t index);
+	virtual void removeByTitle(uint32_t index);
 	virtual void log(const std::string& msg);
 
 	

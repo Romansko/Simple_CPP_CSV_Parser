@@ -17,14 +17,6 @@ CCSVParser::~CCSVParser()
 {
 }
 
-/**
- * Returns the parsed table.
- * Note: Deep copy is performed on return.
- */
-table_t CCSVParser::getTable()
-{
-	return m_table;
-}
 
 void CCSVParser::reset()
 {
@@ -48,7 +40,7 @@ bool CCSVParser::parse(const char* filePath)
 	log("csv file Parse started..");
 	reset();
 
-	unsigned int cellsSum = 0;  // for NxN validity.
+	uint32_t cellsSum = 0;  // for NxN validity.
 	std::string stringLine;
 	while (std::getline(inputFileStream, stringLine))
 	{
@@ -78,7 +70,7 @@ bool CCSVParser::parse(const char* filePath)
 /**
  * Removes a specific row by index, if exists.
  */
-void CCSVParser::removeRow(unsigned int index)
+void CCSVParser::removeRow(uint32_t index)
 {
 	if (index < m_table.size())
 	{
@@ -89,7 +81,7 @@ void CCSVParser::removeRow(unsigned int index)
 /**
  * Delete a specific column by index, if exists.
  */
-void CCSVParser::removeByTitle(unsigned int index)
+void CCSVParser::removeByTitle(uint32_t index)
 {
 	if (!m_table.empty() && index < m_table[0].size())  // assume table is NxN sized.
 	{
@@ -110,8 +102,8 @@ void CCSVParser::removeByTitle(const std::string& title)
 		return;
 	}
 	// scan title by reverse iterator.
-	unsigned int index = m_table[TITLES_INDEX].size() - 1;
-	row_t titlesCopy   = m_table[TITLES_INDEX];
+	uint32_t index = m_table[HEADER_INDEX].size() - 1;
+	row_t titlesCopy   = m_table[HEADER_INDEX];
 	for (auto tbTitle = titlesCopy.rbegin(); tbTitle != titlesCopy.rend(); ++tbTitle)
 	{
 		if (title == *tbTitle)  // std::string == operator uses compare() function. so it's ok.
@@ -139,11 +131,11 @@ void CCSVParser::filter(row_t& columnsToKeep)
 	}
 
 	// Scan titles and mark the columns to keep.
-	bool* const toKeepArray = new bool[m_table[TITLES_INDEX].size()]{false};
+	bool* const toKeepArray = new bool[m_table[HEADER_INDEX].size()]{false};
 	for (auto title = columnsToKeep.begin(); title != columnsToKeep.end(); ++title)
 	{
-		unsigned int index = 0;
-		for (auto tbTitle = m_table[TITLES_INDEX].begin(); tbTitle != m_table[TITLES_INDEX].end(); ++tbTitle)
+		uint32_t index = 0;
+		for (auto tbTitle = m_table[HEADER_INDEX].begin(); tbTitle != m_table[HEADER_INDEX].end(); ++tbTitle)
 		{
 			if (*title == *tbTitle)  // std::string == operator uses compare() function. so it's ok.
 			{
@@ -154,7 +146,7 @@ void CCSVParser::filter(row_t& columnsToKeep)
 	}
 	
 	// reverse iteration idiom for unsigned loops.
-	for (auto index = m_table[TITLES_INDEX].size(); index --> 0; )
+	for (auto index = m_table[HEADER_INDEX].size(); index --> 0; )
 	{
 		if (!toKeepArray[index])
 		{
@@ -162,6 +154,124 @@ void CCSVParser::filter(row_t& columnsToKeep)
 		}
 	}
 	delete[] toKeepArray;
+}
+
+
+/**
+ * Returns the parsed table.
+ * Note: Deep copy is performed on return.
+ */
+table_t CCSVParser::getTable()
+{
+	return m_table;
+}
+
+/***
+ * Returns the number of columns in the table.
+ */
+size_t CCSVParser::getColumnsSize()
+{
+	if (m_table.empty())
+	{
+		return 0;
+	}
+	return m_table[HEADER_INDEX].size();
+}
+
+/**
+ * Returns the number of rows in the table WITHOUT the header.
+ */
+size_t CCSVParser::getRowSize()
+{
+	return (m_table.size() - 1);  // without header row.
+}
+
+row_t CCSVParser::getHeader()
+{
+	row_t hdr;
+	if (!m_table.empty())
+	{
+		hdr = m_table[HEADER_INDEX];
+	}
+	return hdr;
+}
+
+
+
+/***
+ * given row & col index, return parsed value.
+ * Note: row index is excluding header.
+ */
+bool CCSVParser::getValue(uint32_t row, uint32_t col, int32_t& parsedVal)
+{
+	try
+	{
+		parsedVal = std::stoi(m_table[row + 1][col]);
+		return true;
+	}
+	catch (...) { /* Do Nothing */ }
+	return false;
+}
+
+/***
+ * given row & col index, return parsed value.
+ * Note: row index is excluding header.
+ */
+bool CCSVParser::getValue(uint32_t row, uint32_t col, int64_t& parsedVal)
+{
+	try
+	{
+		parsedVal = std::stoll(m_table[row + 1][col]);
+		return true;
+	}
+	catch (...) { /* Do Nothing */ }
+	return false;
+}
+
+/***
+ * given row & col index, return parsed value.
+ * Note: row index is excluding header.
+ */
+bool CCSVParser::getValue(uint32_t row, uint32_t col, float& parsedVal)
+{
+	try
+	{
+		parsedVal = std::stof(m_table[row + 1][col]);
+		return true;
+	}
+	catch (...) { /* Do Nothing */ }
+	return false;
+}
+
+/***
+ * given row & col index, return parsed value.
+ * Note: row index is excluding header.
+ */
+bool CCSVParser::getValue(uint32_t row, uint32_t col, double& parsedVal)
+{
+	try
+	{
+		parsedVal = std::stod(m_table[row + 1][col]);
+		return true;
+	}
+	catch (...) { /* Do Nothing */ }
+	return false;
+}
+
+
+/***
+ * given row & col index, return parsed value.
+ * Note: row index is excluding header.
+ */
+bool CCSVParser::getValue(uint32_t row, uint32_t col, const char** parsedVal)
+{
+	try
+	{
+		*parsedVal = m_table[row + 1][col].c_str();
+		return true;
+	}
+	catch (...) { /* Do Nothing */ }
+	return false;
 }
 
 void CCSVParser::log()
